@@ -26,6 +26,11 @@ const christmasTeamNames = [
   "Star Shiners"
 ];
 
+export enum StealEnum {
+  MINUS_FIVE = "MINUS_FIVE",
+  HALF = "HALF",
+}
+
 export type Team = {
   id: number;
   name: string;
@@ -92,16 +97,25 @@ export class App {
     team.score.update(s => Math.ceil(s / 2));
   }
 
-  stealHalfScore(receivingTeam: Team, targetTeamId: number) {
-    console.log(receivingTeam);
-    console.log(targetTeamId);
-    const target = this.teams().find(t => t.id === targetTeamId);
-    if (!target) return;
+  stealHalfScore(receivingTeam: Team, stealParams: { targetTeam: Team, stealEnum: StealEnum }) {
+    switch (stealParams.stealEnum) {
+      case StealEnum.HALF: {
+        const half = Math.ceil(stealParams.targetTeam.score() / 2);
+        receivingTeam.score.update(s => s + half);
+        stealParams.targetTeam.score.update(s => this.subtractScore(s, half));
+        break;
+      }
+      case StealEnum.MINUS_FIVE: {
+        const amount = Math.min(stealParams.targetTeam.score(), 5);
+        receivingTeam.score.update(s => s + amount);
+        stealParams.targetTeam.score.update(s => this.subtractScore(s, 5));
+        break;
+      }
+    }
+  }
 
-    const half = Math.ceil(target.score() / 2);
-
-    receivingTeam.score.update(s => s + half);
-    target.score.update(s => s - half);
+  private subtractScore(score: number, amount: number): number {
+    return Math.max(0, score - amount);
   }
 
 }

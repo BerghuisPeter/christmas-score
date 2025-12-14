@@ -30,20 +30,33 @@
       <button
         type="button"
         class="px-4 py-1 bg-purple-500 text-white hover:bg-purple-600 transition h-full"
-        (click)="steal.emit(+sel.value)"
+        (click)="stealAction()"
+        [disabled]="!selectedTeam || !selectedStealEnum"
       >
         Steal
       </button>
 
       <select
-        #sel
+        [(ngModel)]="selectedStealEnum"
         class="px-3 py-1 bg-white text-gray-800 border-l border-gray-300 cursor-pointer
                    focus:ring-2 focus:ring-purple-300 h-full"
       >
+        <option [ngValue]="StealEnum.HALF">
+          Half
+        </option>
+        <option [ngValue]="StealEnum.MINUS_FIVE">
+          -5
+        </option>
+      </select>
+
+      <select [(ngModel)]="selectedTeam"
+              class="px-3 py-1 bg-white text-gray-800 border-l border-gray-300 cursor-pointer
+                   focus:ring-2 focus:ring-purple-300 h-full"
+      >
         @for (otherTeam of allTeams; track otherTeam.id) {
-          <option [value]="otherTeam.id" [disabled]="otherTeam.id === team.id" [ngClass]="{
+          <option [disabled]="otherTeam.id === team.id" [ngClass]="{
             'bg-red-300': otherTeam.id === team.id
-           }">
+           }" [ngValue]="otherTeam">
             {{ otherTeam.name }}
           </option>
         }
